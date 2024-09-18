@@ -68,7 +68,7 @@
                             </div>
                             <div class="flex" style="min-width: 180px">
                                 <small class="text-black-100">
-                                    <span>No announcement.</span><br>
+                                    <span>No announcement</span><br>
                                 </small>
                             </div>
                         </div>
