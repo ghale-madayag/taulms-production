@@ -31,10 +31,10 @@
             <button v-else-if="lesson.quiz[index].student_quiz_status_pending.length" @click="continueQuiz(lesson.quiz[index].slug,lesson.quiz[index].student_quiz_status_pending[0].question_id)" class="btn btn-primary ml-sm-16pt">Resume Quiz</button>
         </div>
 
-
+        
         <button @click="complete"
                 class="btn btn-primary ml-sm-16pt"
-                v-if="link[link_next].slug == active && auth.role != 'faculty'"
+                v-if="link[link_next].slug == active && auth.role != 'faculty' && lesson.is_midterm_completed == 1 || lesson.is_finals_completed == 1"
                 :disabled="nextBtn"
                 :class="{ 'is-loading': nextBtn}" >Complete {{ lesson.term == 1 ? 'Midterm' : 'Finals'}}<i class="material-icons icon--right">done</i></button>
     </div>

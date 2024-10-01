@@ -102,6 +102,8 @@ Route::middleware('auth')->group(function(){
         Route::get('/lesson/{subject:slug}/{section}/{user}', 'listView')->middleware(['permission:view all lesson']);
 
         Route::put('/lesson/sort','sort');
+        Route::put('/lesson/ismidterm/{lesson}', 'ismidterm');
+        Route::put('/lesson/isfinals/{lesson}', 'isfinals');
         Route::post('/lesson/store','store');
         Route::post('/lesson/{lesson}/update','update');
         Route::delete('/lesson/{lesson}','destroy');

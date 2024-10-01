@@ -59,7 +59,7 @@
                                 <li class="list-group shadow-none border-0" :key="element.id" :data-id="element.id" :data-index="index">
                                     <div class="accordion__item">
                                         <a href="#" class="accordion__toggle" data-toggle="collapse" :data-target="'#course-toc-'+element.id" data-parent="#parent" aria-expanded="true">
-                                           <span v-if="auth.permission.includes('edit lesson')" class="handle material-icons mr-2 text-muted" style="cursor: n-resize;">drag_handle</span>
+                                            <span v-if="auth.permission.includes('edit lesson') && subjects.lesson_mid?.at(-1)?.is_midterm_completed == 0" class="handle material-icons mr-2 text-muted" style="cursor: n-resize;">drag_handle</span>
                                             <span class="flex" :class="{'text-muted': element.published==0}">{{ element.title }}</span>
                                             <div class="dropdown" v-if="auth.permission.includes('create lesson')">
                                                 <a href="#"
@@ -120,7 +120,7 @@
                                 <li class="list-group shadow-none border-0" :key="element.id" :data-id="element.id" :data-index="index">
                                     <div class="accordion__item">
                                     <a href="#" class="accordion__toggle" data-toggle="collapse" :data-target="'#course-toc-'+element.id" data-parent="#parent" aria-expanded="true">
-                                        <span v-if="auth.permission.includes('edit lesson')" class="handle material-icons mr-2 text-muted " style="cursor: n-resize;">drag_handle</span>
+                                        <span v-if="auth.permission.includes('edit lesson') && subjects.lesson_fin?.at(-1)?.is_finals_completed == 0" class="handle material-icons mr-2 text-muted " style="cursor: n-resize;">drag_handle</span>
                                         <span class="flex" :class="{'text-muted': element.published==0}">{{ element.title }}</span>
                                         <div class="dropdown" v-if="auth.permission.includes('create lesson')">
                                             <a href="#"

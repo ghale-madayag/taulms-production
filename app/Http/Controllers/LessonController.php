@@ -27,6 +27,22 @@ use Spatie\Permission\Models\Permission;
 
 class LessonController extends Controller
 {
+    public function ismidterm(Lesson $lesson){
+        
+        $lesson->is_midterm_completed = request()->is_midterm_completed;
+        $lesson->save();
+
+        redirect()->back();
+    }
+
+    public function isfinals(Lesson $lesson){
+       // dd(request()->is_finals_completed);
+        $lesson->is_finals_completed = request()->is_finals_completed;
+        $lesson->save();
+
+        redirect()->back();
+    }
+
     public function start(Subject $subject){
         
         $lesson = $subject->lesson()->orderBy('position')

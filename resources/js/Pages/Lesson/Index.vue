@@ -40,7 +40,22 @@
                             </form>
                         </div>
                         <div class="card-body">
-                            <h5 class="mb-0">Midterm</h5>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h5 class="mb-0">Midterm</h5>
+                                <div class="d-flex align-items-center">
+                                    <span class="mr-2 text-primary card-subtitle">Mark as Completed</span>
+                                    <div class="custom-control custom-checkbox-toggle custom-control-inline mr-2">
+                                        <input 
+                                            type="checkbox" 
+                                            id="mid_completed" 
+                                            class="custom-control-input"
+                                            v-model="isMidtermCompleted" 
+                                            @change="saveMidtermState(lessons.lesson_mid.at(-1)?.id || null)"
+                                        >
+                                        <label class="custom-control-label" for="mid_completed"></label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="list-group-flush mb-0">
@@ -61,7 +76,8 @@
                             <template #item="{element, index}">
                                 <div :key="element.id" :data-id="element.id" :data-index="index" class="list-group-item d-flex flex-column flex-sm-row align-items-sm-center px-12pt">
                                     <div class="media flex align-items-center mr-sm-16pt mb-8pt mb-sm-0">
-                                        <span class="handle material-icons mr-2 text-muted" style="cursor: n-resize;">drag_handle</span>
+                                        <span v-if="lessons.lesson_mid?.at(-1)?.is_midterm_completed == 0" class="handle material-icons mr-2 text-muted" style="cursor: n-resize;">drag_handle</span>
+                                        <span v-else class="material-icons mr-2 text-muted" style="cursor: n-resize;">do_not_disturb_on</span>
                                         <div class="avatar avatar-sm mr-8pt">
                                             <div class="avatar avatar-sm mr-8pt">
                                                 <img :src="element.thumbnail ? '/storage/'+element.thumbnail : '/images/blank.webp'" alt="Avatar" class="avatar-img rounded">
@@ -112,7 +128,22 @@
                     </div>
                     <div class="card mt-0 mb-0 rounded-0">
                         <div class="card-body">
-                            <h5 class="mb-0">Finals</h5>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h5 class="mb-0">Finals</h5>
+                                <div class="d-flex align-items-center">
+                                    <span class="mr-2 text-primary card-subtitle">Mark as Completed</span>
+                                    <div class="custom-control custom-checkbox-toggle custom-control-inline mr-2">
+                                        <input 
+                                            type="checkbox" 
+                                            id="fin_completed" 
+                                            class="custom-control-input"
+                                            v-model="isFinalCompleted" 
+                                            @change="saveFinalState (lessons.lesson_fin.at(-1)?.id || null)"
+                                        >
+                                        <label class="custom-control-label" for="fin_completed"></label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="list-group-flush">
@@ -133,7 +164,8 @@
                             <template #item="{element, index}">
                                 <div :key="element.id" :data-id="element.id" :data-index="index" class="list-group-item d-flex flex-column flex-sm-row align-items-sm-center px-12pt">
                                     <div class="media flex align-items-center mr-sm-16pt mb-8pt mb-sm-0">
-                                        <span class="handle material-icons mr-2 text-muted" style="cursor: n-resize;">drag_handle</span>
+                                        <span v-if="lessons.lesson_fin?.at(-1)?.is_finals_completed == 0" class="handle material-icons mr-2 text-muted" style="cursor: n-resize;">drag_handle</span>
+                                        <span v-else class="material-icons mr-2 text-muted" style="cursor: n-resize;">do_not_disturb_on</span>
                                         <div class="avatar avatar-sm mr-8pt">
                                             <div class="avatar avatar-sm mr-8pt">
                                                 <img :src="element.thumbnail ? '/storage/'+element.thumbnail : '/images/blank.webp'" alt="Avatar" class="avatar-img rounded">
@@ -208,7 +240,7 @@ export default {
 import Breadcrumbs from '../Components/Breadcrumbs.vue';
 import CourseHeader from '../../Shared/CourseHeader';
 import {useForm} from "@inertiajs/inertia-vue3";
-import {ref,watch} from "vue";
+import {ref,watch,computed} from "vue";
 import  debounce from "lodash/debounce";
 import {Inertia} from "@inertiajs/inertia";
 import Swal from 'sweetalert2/dist/sweetalert2';
@@ -225,8 +257,24 @@ let props = defineProps({
     total: Number,
     published: Number,
     pending: Number,
-    flash: Object,
+    flash: Object
 })
+
+const isMidtermCompleted = ref(false);
+const isFinalCompleted = ref(false);
+
+if (props.lessons.lesson_mid?.at(-1)?.is_midterm_completed == 1) {
+    isMidtermCompleted.value = true;
+} else {
+    isMidtermCompleted.value = false;
+}
+
+if(props.lessons.lesson_fin?.at(-1)?.is_finals_completed == 1){
+    isFinalCompleted.value = true;
+}else{
+    isFinalCompleted.value = false;
+}
+
 
 let lessForm = useForm({
     position: [],
@@ -235,6 +283,53 @@ let lessForm = useForm({
 })
 
 let form = useForm();
+
+const isTerm = useForm({
+    id:null,
+    is_midterm_completed: isMidtermCompleted.value,
+    is_finals_completed: isFinalCompleted.value,
+});
+
+// Function to save toggle state to the server
+const saveMidtermState = (id) => {
+    isTerm.id = id;
+    isTerm.is_midterm_completed = isMidtermCompleted.value;
+
+    isTerm.put('/lesson/ismidterm/'+id, {
+        preserveScroll: true,
+        onSuccess: () => {
+            console.log('State updated successfully!');
+        },
+        onError: () => {
+            console.error('Failed to update state.');
+        },
+    });
+};
+
+const saveFinalState  = (id) => {
+    isTerm.id = id;
+    isTerm.is_finals_completed = isFinalCompleted.value;
+
+    isTerm.put('/lesson/isfinals/'+id, {
+        preserveScroll: true,
+        onSuccess: () => {
+            console.log('State updated successfully!');
+        },
+        onError: () => {
+            console.error('Failed to update state.');
+        },
+    });
+};
+
+// Watch for changes in isMidtermCompleted and update the form value
+watch(isMidtermCompleted, (newValue) => {
+    isTerm.is_midterm_completed = newValue;
+});
+
+watch(isFinalCompleted, (newValue) => {
+    isTerm.is_finals_completed = newValue;
+});
+
 let dup = useForm({
     subject: '',
     section: '',
